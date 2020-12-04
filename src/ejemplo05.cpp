@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
 	cout<<"Proceso "<<rank<<", tiene data: ";
           for (i=0; i<size; i++)
 		  cout<<globaldata[i]<<" ";
-	cout<<endl;    
+	cout<<endl;
 
   }
 // Comunicacion
@@ -43,15 +43,3 @@ int main(int argc, char **argv) {
    MPI_Finalize();
     return 0;
 }
-
-
-
-
-
-
-
-
-
-
-
-
