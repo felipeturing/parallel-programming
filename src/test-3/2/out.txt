@@ -1,0 +1,15 @@
+([PROMEDIO TOTAL], [TIEMPO], [PROCESOS],[CANTIDAD DE NUMEROS REPARTIDOS POR PROCESO],[CANTIDAD DE NUMEROS NO REPARTIDOS])
+
+Puntos para graficar t vs p
+
+( 	49.56600, 	0.0000059605, 	1, 	1000, 	0)
+( 	49.56600, 	0.0000016689, 	2, 	 500, 	0)
+( 	47.43093, 	0.0000011921, 	3, 	 333, 	1)
+( 	49.56600, 	0.0000009537, 	4, 	 250, 	0)
+( 	49.56600, 	0.0000007153, 	5, 	 200, 	0)
+( 	39.10301, 	0.0000007153, 	6, 	 166, 	4)
+( 	50.10130, 	0.0000004768, 	7, 	 142, 	6)
+( 	51.87900, 	0.0000004768, 	8, 	 125, 	0)
+
+
+Nota : Los números no repartidos también se promedian al final, en el proceso maestro.
