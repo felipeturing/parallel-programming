@@ -10,9 +10,9 @@ float averageCalculation(float array[], unsigned int length);
 void pseudoRandomArray(float (&array)[1000000]);
 
 int main( int argc, char **argv){
-    int rank, size, i;
-    float global[1000000], globalAverage, localAverage;
-    double start, end;
+    int rank, size, i=0;
+    float global[1000000], globalAverage=0.0, localAverage=0.0;
+    double start=0.0, end=0.0;
 
     MPI_Status status;
     MPI_Request request = MPI_REQUEST_NULL;
@@ -30,7 +30,6 @@ int main( int argc, char **argv){
     **/
     if(rank == 0){
         pseudoRandomArray(global);
-//        for (i=0;i<10;i++) printf("%f\n",global[i]);
         start = MPI_Wtime(); // vamos a incluir el tiempo de comunicación (blocking comm) y el tiempo de los calculos
         for (i = 1; i < size; i++) MPI_Isend(&global[i*partition], partition, MPI_FLOAT, i, 111, MPI_COMM_WORLD, &request);
     }
@@ -43,7 +42,8 @@ int main( int argc, char **argv){
         localAverage = averageCalculation(global, partition);
     }else{
         MPI_Irecv(&local, partition, MPI_FLOAT, 0, 111, MPI_COMM_WORLD, &request);
-        MPI_Wait(&request, &status);// espera, sincroniza y bloquea hasta que la comm p2p (isend->irecv) se complete
+        MPI_Wait(&request, &status);
+
         localAverage = averageCalculation(local, partition);
         MPI_Isend(&localAverage, 1, MPI_FLOAT, 0, 112, MPI_COMM_WORLD, &request);
     }
@@ -56,13 +56,11 @@ int main( int argc, char **argv){
         average[0] = localAverage;
         for (i = 1; i < size; i++){
             MPI_Irecv(&average[i], 1, MPI_FLOAT, i, 112, MPI_COMM_WORLD, &request);
-            MPI_Wait(&request, &status);
+            MPI_Wait(&request, &status); // es necesario esperar recibir cada uno de los promedios calculados en cada rank
         }
         globalAverage = averageCalculation(average, size);
         end = MPI_Wtime();
     }
-
-    MPI_Wait(&request, &status);
 
     if(rank == 0){
         printf("\t(%4.8f, \t%.10f)\n", globalAverage, end-start);
@@ -73,10 +71,11 @@ int main( int argc, char **argv){
 }
 
 
+
+
 float averageCalculation(float array[], unsigned int length){
-    float average = 0.0;
-    for(unsigned int i=0; i<length; i++) average += array[i];
-    return average/length;
+    for(unsigned int i=1; i<length; i++) array[0] += array[i];
+    return array[0]/length;
 }
 
 void pseudoRandomArray(float (&array)[1000000]){

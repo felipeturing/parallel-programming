@@ -21,7 +21,11 @@ int main( int argc, char **argv){
     sum *= 1.0/(double)n;
     end=MPI_Wtime();
 
-    MPI_Barrier(MPI_COMM_WORLD);
+    MPI_Barrier(MPI_COMM_WORLD); //One of the primary uses of MPI_Barrier is to synchronize a program so that portions of the parallel code can be timed accurately.
+
+    /** T4 :
+        MPI_Reduce(&datasend, &result, count, MPI_FLOAT, MPI_SUM, dest, MPI_COMM_WORLD);
+    **/
     MPI_Reduce(&sum, &pi, 1, MPI_DOUBLE, MPI_SUM, 0,MPI_COMM_WORLD);
 
     if(rank == 0){

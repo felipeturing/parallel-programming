@@ -67,10 +67,10 @@ int main( int argc, char **argv){
     return 0;
 }
 
+
 float averageCalculation(float array[], unsigned int length){
-    float average = 0.0;
-    for(unsigned int i=0; i<length; i++) average += array[i];
-    return average/length;
+    for(unsigned int i=1; i<length; i++) array[0] += array[i];
+    return array[0]/length;
 }
 
 void pseudoRandomArray(float (&array)[1000000]){
