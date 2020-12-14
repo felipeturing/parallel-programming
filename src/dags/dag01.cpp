@@ -19,40 +19,50 @@ MPI_Comm_rank(MPI_COMM_WORLD,&rank);
 
 /* primera fase */
 if (rank==0) {
-a = T1(i);
-MPI_Recv(&b, 1, MPI_DOUBLE, 1, 111, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-MPI_Recv(&c, 1, MPI_DOUBLE, 2, 111, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    a = T1(i);
+    MPI_Recv(&b, 1, MPI_DOUBLE, 1, 111, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(&c, 1, MPI_DOUBLE, 2, 111, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 } else if (rank==1) {
-b = T2(j);
-MPI_Send(&b, 1, MPI_DOUBLE, 0, 111, MPI_COMM_WORLD);
+    b = T2(j);
+    MPI_Send(&b, 1, MPI_DOUBLE, 0, 111, MPI_COMM_WORLD);
 } else { /* rank==2 */
-c = T3(k);
-MPI_Send(&c, 1, MPI_DOUBLE, 0, 111, MPI_COMM_WORLD);
+    c = T3(k);
+    MPI_Send(&c, 1, MPI_DOUBLE, 0, 111, MPI_COMM_WORLD);
 }
-/* segunda fase */ if (rank==0) {
-d = T4(a+b+c);
+
+
+/* segunda fase */
+if (rank==0) {
+    d = T4(a+b+c);
 //cout<<"rank: "<<rank<<", d: "<<d<<endl;
 }
-/* tercera fase */ if (rank==0) {
-MPI_Send(&d, 1, MPI_DOUBLE, 1, 112, MPI_COMM_WORLD);
-MPI_Send(&d, 1, MPI_DOUBLE, 2, 112, MPI_COMM_WORLD);
-x = T5(a/d);
+
+/* tercera fase */
+if (rank==0) {
+    MPI_Send(&d, 1, MPI_DOUBLE, 1, 112, MPI_COMM_WORLD);
+    MPI_Send(&d, 1, MPI_DOUBLE, 2, 112, MPI_COMM_WORLD);
+    x = T5(a/d);
 } else if (rank==1) {
-MPI_Recv(&d, 1, MPI_DOUBLE, 0, 112, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-y = T6(b/d);
+    MPI_Recv(&d, 1, MPI_DOUBLE, 0, 112, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    y = T6(b/d);
 } else { /* rank==2 */
-MPI_Recv(&d, 1, MPI_DOUBLE, 0, 112, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-z = T7(c/d);
+    MPI_Recv(&d, 1, MPI_DOUBLE, 0, 112, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    z = T7(c/d);
 }
-/* suma final */ if (rank==0) {
-MPI_Recv(&y, 1, MPI_DOUBLE, 1, 113, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-MPI_Recv(&z, 1, MPI_DOUBLE, 2, 113, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+
+
+/* suma final */
+if (rank==0) {
+    MPI_Recv(&y, 1, MPI_DOUBLE, 1, 113, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+    MPI_Recv(&z, 1, MPI_DOUBLE, 2, 113, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 } else if (rank==1) {
-MPI_Send(&y, 1, MPI_DOUBLE, 0, 113, MPI_COMM_WORLD);
+    MPI_Send(&y, 1, MPI_DOUBLE, 0, 113, MPI_COMM_WORLD);
 } else { /* rank==2 */
-MPI_Send(&z, 1, MPI_DOUBLE, 0, 113, MPI_COMM_WORLD); }
+    MPI_Send(&z, 1, MPI_DOUBLE, 0, 113, MPI_COMM_WORLD);
+}
+
 if(rank==0)
-cout<< x+y+z<<endl;
+    cout<< x+y+z<<endl;
 }
 
 int main(int argc, char*argv[]){
