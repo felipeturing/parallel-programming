@@ -5,7 +5,7 @@ Running :
 mpirun --oversubscribe -np [rank] ./app
 
 Remark:
-I use mpirun (Open MPI) 4.0.3 version (mpirun --version), for this version if I would want rank > 2  add the flag
+I use mpirun (Open MPI) 4.0.3 version (mpirun --version), for this version if I would want rank > 2  must add the flag
 --oversubscribe in running command line, because my system info is  Intel© Pentium© CPU G3260 @ 3.30GHz × 2. (by default two nodes)
 
 * I have two ranks by default and if not add --oversubscribe, then only can use those two.
