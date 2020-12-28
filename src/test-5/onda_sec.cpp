@@ -11,30 +11,29 @@ using namespace std;
 
 //global variables
 int nsteps=0, tpoints=0;
-double values[MAXPOINTS + 2], oldval[MAXPOINTS + 2], newval[MAXPOINTS + 2];
+double values[MAXPOINTS + 2]={0}, oldval[MAXPOINTS + 2]={0}, newval[MAXPOINTS + 2]={0};
 
 // prototypes
 void init_param(void);
 void init_line(void);
 void do_math(int i);
 void update(void);
+void print_foto_final_de_la_onda(void);
 
 // main method
-int main(int argc, char *argv[])
-{
+int main(int argc, char **argv){
     init_param();
-    init_line();
-    update(); // en este método también mostramos la foto inicial y la foto de la onda en cada paso
+    init_line(); // en este método también podríamos mostrar la foto inicial de la onda
+    update(); // en este método también podríamos mostrar la foto de la onda por cada step, para realizar la animación
+    print_foto_final_de_la_onda();
     return 0;
 }
 
 
 //definitions
-void init_param(void)
-{
+void init_param(void){
     tpoints = 800; // por cada paso (i.e por cada foto) vamos a 50 puntos de la función.
     nsteps = 1000; // estas son como 300 fotos de la onda que vamos a considerar en tiempos t = k,2k,3k,etc.
-    printf("Using points = %d, steps = %d\n", tpoints, nsteps);
 }
 
 void init_line(void)
@@ -48,15 +47,17 @@ void init_line(void)
         k = k + 1.0;
     }
 
-    //la foto inicial se guardar en los valores antiguos(t-dt) puesto que a manipulares los valores en el tiempo t
+    //la foto inicial se guardar en los valores antiguos puesto que a manipularemos los valores en el tiempo t
     for (int i = 1; i <= tpoints; i++){
         oldval[i] = values[i];
     }
 
-    printf("Foto inicial de la onda \n");
-    for (int k = 1; k <= tpoints; k++){
-            printf("%.3f\n", values[k]);
-    }
+    /*printf("Foto inicial de la onda \n");
+    for (int j = 1; j <= tpoints; j++){
+        x = k / tmp;
+        printf("(%.7f,\t %.7f)\n", 2.0 * PI * x , values[j]);
+         k = k + 1.0;
+    }*/
 }
 void do_math(int i)
 {
@@ -68,6 +69,7 @@ void do_math(int i)
     // la discretización
     newval[i] = (2.0 * values[i]) - oldval[i] + (sqtau * (values[i - 1] - (2.0 * values[i]) + values[i + 1]));
 }
+
 void update(void)
 {
     //actualizar los punto por cada foto y por cada punto
@@ -85,10 +87,20 @@ void update(void)
             oldval[j] = values[j];
             values[j] = newval[j];
         }
-        printf("Foto de la onda en el paso : %d\n", i);
+
+        /*printf("Foto de la onda en el paso : %d\n", i);
         for (int k = 1; k <= tpoints; k++)
         {
             printf("%.3f\n", values[k]);
-        }
+        }*/
+    }
+}
+
+void print_foto_final_de_la_onda(void){
+    double x, k=0.002, tmp = tpoints - 1;// esto me va servir para graficar los puntos en el eje del tiempo
+    for (int j = 1; j <= tpoints; j++){
+        x = k / tmp;
+        printf("(%.7f,\t %.7f)\n", 2.0 * PI * x , values[j]);
+        k = k + 1.0;
     }
 }

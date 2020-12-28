@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <iostream>
 #include <math.h>
+
 using namespace std;
 
 #define MAXPOINTS 1000
@@ -14,43 +15,37 @@ using namespace std;
 
 //global variables
 int nsteps=0, tpoints=0, nlocal=0;
-double values_maestro[MAXPOINTS + 2], local_values[MAXPOINTS +2], local_old_values[MAXPOINTS +2], local_new_values[MAXPOINTS + 2];
+double master_root_rank_values[MAXPOINTS + 2]={0}, local_values[MAXPOINTS +2]={0}, local_old_values[MAXPOINTS +2]={0}, local_new_values[MAXPOINTS + 2]={0};
 
 // prototypes
 void init_param(int size);
 void init_line(int rank, int size);
 void do_math(int i);
 void update(int left, int right, int rank, int size);
+void print_foto_final_de_la_onda(void);
 
 // main method
 int main(int argc, char **argv){
     int rank, size, right, left;
+    double start, end;
     MPI_Init(&argc, &argv);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-    init_param(size);
-    //printf("%.d\n", nlocal);
-    init_line(rank, size);
-
-    /* //esto lo hice para que el rank cero se encargue de calcular la foto inicial de la onda y enviar al resto los valors.
-    MPI_Scatter(&values[1],nlocal, MPI_DOUBLE, &local_values[1], nlocal, MPI_DOUBLE, 0, MPI_COMM_WORLD);
-    for(int i=1 ; i<=nlocal;i++) {printf("rank %d :", rank); printf("%.3f\n",local_values[i]);}
-    MPI_Barrier(MPI_COMM_WORLD);*/
-
-    //for(int i=1 ; i<=nlocal;i++) {printf("rank %d :", rank); printf("%.3f\n",local_values[i]);}
-    right = rank + 1; left = rank - 1;
-
-
+    start = MPI_Wtime();
+        init_param(size);
+        init_line(rank, size);
+        right = rank + 1; left = rank - 1;
+        update(left, right, rank, size);
+    end = MPI_Wtime();
+    if(rank == 0) {print_foto_final_de_la_onda(); printf("\n\n Runtime : %.10f\n", end-start);}
     MPI_Finalize();
     return 0;
 }
 
-
-
+// functions definition
 void init_param(int size){
-    tpoints = 9;
-    nsteps = 2;
+    tpoints = 800;
+    nsteps = 1000;
     nlocal = tpoints/size;
 }
 
@@ -75,23 +70,23 @@ void do_math(int i){
 
 void update(int left, int right, int rank, int size){
     for ( int  i  =  1 ;  i  <=  nsteps ; i++){
-        if(rank = 0 ){
-            MPI_Send(&local_values[nlocal], 1, MPI_DOUBLE, right, LtoR, MPI_COMM_WORLD); //
+        if(rank == 0 ){
+            MPI_Send(&local_values[nlocal], 1, MPI_DOUBLE, right, LtoR, MPI_COMM_WORLD);
             MPI_Recv(&local_values[nlocal + 1], 1, MPI_DOUBLE, right, RtoL , MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }
-        else if(rank = size - 1 ){
+        else if(rank == size - 1 ){
             MPI_Send(&local_values[1], 1, MPI_DOUBLE, left, RtoL, MPI_COMM_WORLD);
             MPI_Recv(&local_values[0], 1, MPI_DOUBLE, left, LtoR , MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }
         else{
+            MPI_Send(&local_values[1], 1, MPI_DOUBLE, left, RtoL, MPI_COMM_WORLD);
+            MPI_Send(&local_values[nlocal], 1, MPI_DOUBLE, right, LtoR, MPI_COMM_WORLD);
             MPI_Recv(&local_values[0], 1, MPI_DOUBLE, left, LtoR , MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            MPI_Recv(&local_values[nlocal+1], 1, MPI_DOUBLE, left, LtoR , MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-            MPI_Send(&local_values[0], 1, MPI_DOUBLE, left, RtoL, MPI_COMM_WORLD); //
-            MPI_Send(&local_values[nlocal], 1, MPI_DOUBLE, right, LtoR, MPI_COMM_WORLD); //
+            MPI_Recv(&local_values[nlocal+1], 1, MPI_DOUBLE, right, RtoL , MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         }
 
         for (int j  = 1; j <= nlocal; j++){
-            if ((j == 1 && rank == 0) || (j == nlocal && rank = size - 1)){
+            if ((j == 1 && rank == 0) || (j == nlocal && rank == size - 1)){
                 local_new_values[j] = 0.0;
             }
             else{
@@ -99,10 +94,26 @@ void update(int left, int right, int rank, int size){
             }
         }
 
-        for (int j = 1; j <= tpoints; j++){
+        for (int j = 1; j <= nlocal; j++){
             local_old_values[j] = local_values[j];
             local_values[j] = local_new_values[j];
         }
 
+        MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Gather(&local_values[1], nlocal, MPI_DOUBLE, &master_root_rank_values[1], nlocal, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+
+        /*if(rank == 0){
+            printf("Foto de la onda en el paso : %d\n", i);
+            print_foto_final_de_la_onda();
+        }*/
+    }
+}
+
+void print_foto_final_de_la_onda(void){
+    double x, k=0.002, tmp = tpoints - 1;// esto me va servir para graficar los puntos en el eje del tiempo
+    for (int j = 1; j <= tpoints; j++){
+        x = k / tmp;
+        printf("(%.7f,\t %.7f)\n", 2.0 * PI * x , master_root_rank_values[j]);
+        k = k + 1.0;
     }
 }
