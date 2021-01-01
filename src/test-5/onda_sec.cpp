@@ -18,22 +18,22 @@ void init_param(void);
 void init_line(void);
 void do_math(int i);
 void update(void);
-void print_foto_final_de_la_onda(void);
+void print_onda(void);
 
 // main method
 int main(int argc, char **argv){
     init_param();
     init_line(); // en este método también podríamos mostrar la foto inicial de la onda
     update(); // en este método también podríamos mostrar la foto de la onda por cada step, para realizar la animación
-    print_foto_final_de_la_onda();
+    print_onda();
     return 0;
 }
 
 
 //definitions
 void init_param(void){
-    tpoints = 800; // por cada paso (i.e por cada foto) vamos a 50 puntos de la función.
-    nsteps = 1000; // estas son como 300 fotos de la onda que vamos a considerar en tiempos t = k,2k,3k,etc.
+    tpoints = 800;
+    nsteps = 1000;
 }
 
 void init_line(void)
@@ -53,11 +53,7 @@ void init_line(void)
     }
 
     /*printf("Foto inicial de la onda \n");
-    for (int j = 1; j <= tpoints; j++){
-        x = k / tmp;
-        printf("(%.7f,\t %.7f)\n", 2.0 * PI * x , values[j]);
-         k = k + 1.0;
-    }*/
+    print_onda();*/
 }
 void do_math(int i)
 {
@@ -82,25 +78,23 @@ void update(void)
                 do_math(j);
             }
         }
-        // pasamos lo actual a los pasado y lo calculado nuevo a lo actual
+        // pasamos lo actual a lo pasado y lo nuevo a lo actual
         for (int j = 1; j <= tpoints; j++){
             oldval[j] = values[j];
             values[j] = newval[j];
         }
 
         /*printf("Foto de la onda en el paso : %d\n", i);
-        for (int k = 1; k <= tpoints; k++)
-        {
-            printf("%.3f\n", values[k]);
-        }*/
+        print_onda();
+        */
     }
 }
 
-void print_foto_final_de_la_onda(void){
+void print_onda(void){
     double x, k=0.002, tmp = tpoints - 1;// esto me va servir para graficar los puntos en el eje del tiempo
     for (int j = 1; j <= tpoints; j++){
         x = k / tmp;
-        printf("(%.7f,\t %.7f)\n", 2.0 * PI * x , values[j]);
+        printf("(%.7f,\t %.7f)\n", 2.0 * PI * x , values[j]);//imprime los puntos de la onda
         k = k + 1.0;
     }
 }
