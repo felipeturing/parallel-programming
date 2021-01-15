@@ -1,26 +1,24 @@
 #include <iostream>
+#include <cassert> // or assert.h
+#include <stdlib.h>
 #include <omp.h>
 using namespace std;
 
 int main(int argc, char **argv){
-    //thread master start
-    int n_threads=4,id;
-    //omp_set_num_threads(n_threads);
 
-    //thread master end
+    int i=5,j=6;
 
-    // fork start
-    #pragma omp parallel private(id) num_threads(4) //mi pc solo tiene dos hilos por defecto
+    #pragma omp parallel private(i,j) num_threads(4)
     {
-        id = omp_get_thread_num();
-        #pragma omp barrier//barrera que todos los hilos deben chocar antes de seguir avanzando
-        if(id != 0) printf("Saludos desde el hilo %d\n", id); //printf no puede <<partirse>> como el operador sobrecargardo cout<<..<<endl
+        i = 1;
+        j = 2;
+        int *ptr_i = &i;
+        int *ptr_j = &j;
+        assert(*ptr_i==1 && *ptr_j==2); //*ptr_i : para obtener el valor almacenado en la dirección de ptr_i
+        printf("thread %d : (i,j) = (%d,%d)\n",omp_get_thread_num() ,i,j);
+        //#pragma omp barrier
     }
-    //end fork
-
-
-    //thread master start
-        cout<<"Saludos desde maestro\n"<<endl;//acá no hay problema de impresión desordenada puesto que esto se ejecuta solo en el maestro, que por defecto es el hilo 0
-    //thread master end
+    assert(i==1 && j==2); //aborta porque la región en paralelo no modifica las variables originales
+    //printf("master : (i,j) = (%d,%d)\n", i,j);
     return 0;
 }
