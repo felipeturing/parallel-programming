@@ -19,7 +19,7 @@ int main(int argc, char **argv){
                     printf("thread %d \t n[%d] : %d \n", omp_get_thread_num() ,i,n[i]);
                 }
             }
-        //#pragma omp barrier
+        #pragma omp barrier
     }
     return 0;
 }
